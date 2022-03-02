@@ -5,7 +5,7 @@ function [] = myPurePursuit(path)
     vizRate = rateControl(1/sampleTime);
     robotInitialLocation = path(1,:);
     robotGoal = path(end,:);
-    initialOrientation = -pi/2;
+    initialOrientation = pi/2;
     robotCurrentPose = [robotInitialLocation initialOrientation]'; 
     robot = differentialDriveKinematics("TrackWidth", 0.3, "VehicleInputs", "VehicleSpeedHeadingRate");
     rospubRest = rospublisher("/mobile_base/commands/reset_odometry","Dataformat", "struct");
@@ -13,11 +13,11 @@ function [] = myPurePursuit(path)
     send(rospubRest,resetMsg)
 
     controller = controllerPurePursuit;
-    controller.Waypoints = path;
-    controller.DesiredLinearVelocity = 0.2;
+    controller.Waypoints = path;    
+    controller.DesiredLinearVelocity = 0.4;
     controller.MaxAngularVelocity = 5;
-    controller.LookaheadDistance = 0.9;
-    goalRadius = 0.1;
+    controller.LookaheadDistance = 1;
+    goalRadius = 0.2;
     distanceToGoal = norm(robotInitialLocation - robotGoal);
     
     rospub = rospublisher("/mobile_base/commands/velocity","Dataformat", "struct");
@@ -55,8 +55,8 @@ function [] = myPurePursuit(path)
         plotRot = axang2quat([0 0 1 robotCurrentPose(3)]);
         plotTransforms(plotTrVec',plotRot,"MeshFilePath","groundvehiclewithload.stl","Parent",gca,"View","2D","FrameSize",frameSize);
         light;
-        xlim([-2 2])
-        ylim([-2 6])
+        xlim([-1 10])
+        ylim([-4 1])
 
         waitfor(vizRate);
 
